@@ -4,6 +4,18 @@ import sys
 import neat
 pygame.font.init()
 
+
+#notes:
+'''
+for the outta bounds problem you can search inside the tuple by get_head_pos()[0] for 
+[0] = x
+[1] = y
+
+problem: you always get to the edge of the window, you never surpass it
+maybe can fix by creating a bigger window behind the actual window being used
+
+
+'''
 #running = True
 
 class Snake():
@@ -26,7 +38,7 @@ class Snake():
     def move(self):
         cur = self.get_head_pos()
         x,y = self.direction
-        new = (((cur[0]+(x*GRIDSIZE))%WIN_WIDTH), (cur[1]+(y*GRIDSIZE))%WIN_HEIGHT)#((cur[0] + (x*GRIDSIZE)% WIN_WIDTH), (cur[1]+ (y*GRIDSIZE))%WIN_HEIGHT)
+        new = (((cur[0]+(x*GRIDSIZE))%WIN_WIDTH), (cur[1]+(y*GRIDSIZE))%WIN_HEIGHT)
         #these if statements checking if snake tocuhed itself or not
         if len(self.positions) > 2 and new in self.positions[2:]:
             print("You Died") 
@@ -108,9 +120,14 @@ WIN_HEIGHT = 480
 
 
 
+
 GRIDSIZE = 30 # increase this value for bigger squares and decrease for smaller
 GRID_WIDTH = WIN_HEIGHT / GRIDSIZE
 GRID_HEIGHT = WIN_WIDTH/ GRIDSIZE
+
+#this is for side collisions
+NEW_WIN_WIDTH = WIN_WIDTH + GRIDSIZE
+NEW_WIN_HEIGHT = WIN_HEIGHT + GRIDSIZE
 
 UP = (0,-1)
 DOWN = (0, 1)
@@ -122,10 +139,14 @@ def main():
 
     clock = pygame.time.Clock()
     screen = pygame.display.set_mode((WIN_WIDTH,WIN_HEIGHT),0,32)
+    #collision_screen = pygame.display.set_mode((NEW_WIN_WIDTH, NEW_WIN_HEIGHT),0,32)
 
     surface = pygame.Surface(screen.get_size())
+   # surface2 = pygame.Surface(collision_screen.get_size())
     surface = surface.convert()
-    drawGrid(surface)
+    #surface2 = surface2.convert()
+    #drawGrid(surface)
+    #drawGrid(surface2)
 
 
     snake = Snake()
@@ -136,9 +157,14 @@ def main():
         clock.tick(10)
         snake.handle_keys()
         drawGrid(surface)
+        #drawGrid(surface2)
         snake.move()
-        if snake.get_head_pos() == -480:
-            print("at -480")
+        snake_x = snake.get_head_pos()[0]
+        snake_y = snake.get_head_pos()[1]
+        print("x: ", snake.get_head_pos()[0], "y: ", snake.get_head_pos()[1])
+        
+        if snake_x < 0 or snake_x > 480:
+            print("outta boudns on x")
             snake.reset()
         if snake.get_head_pos() == food.position:
             print("Nom Nom")
@@ -154,5 +180,3 @@ def main():
 
 
 main()
-
-
